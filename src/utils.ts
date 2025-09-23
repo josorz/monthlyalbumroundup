@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// DEFAULT FROM SPOTIFY DOCS
 export async function redirectToAuthCodeFlow(clientId: string) {
   const verifier = generateCodeVerifier(128);
   const challenge = await generateCodeChallenge(verifier);
@@ -10,7 +11,10 @@ export async function redirectToAuthCodeFlow(clientId: string) {
   params.append("client_id", clientId);
   params.append("response_type", "code");
   params.append("redirect_uri", "https://127.0.0.1");
-  params.append("scope", "user-read-private user-read-email");
+  params.append(
+    "scope",
+    "user-read-private user-read-email user-read-recently-played"
+  );
   params.append("code_challenge_method", "S256");
   params.append("code_challenge", challenge);
 
@@ -55,3 +59,55 @@ async function generateCodeChallenge(codeVerifier: string) {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
+
+/// CUSTOM FUNCTIONS
+
+export const inferTopAlbums = async ({
+  recentlyPlayed,
+  topArtists,
+  topSongs,
+}) => {
+  // Albums from recently played songs
+  let albums = new Map();
+  let songs = new Map();
+  let albumSongMap = new Map();
+
+  recentlyPlayed.forEach((item) => {
+    const album = item.track.album;
+    const albumId = album.id;
+    const songId = item.track.id;
+
+    if (album.album_type === "album") {
+      if (!albumSongMap.has(albumId)) {
+        albumSongMap.set(albumId, {
+          album: album, // keep full album object
+          songs: new Set(), // keep unique song IDs
+        });
+      }
+
+      albumSongMap.get(albumId).songs.add(songId);
+    }
+  });
+
+  // Convert Map to array
+  let sortedAlbums = Array.from(albumSongMap.values())
+    .map(({ album, songs }) => ({
+      album,
+      uniqueSongs: songs.size,
+      totalTracks: album.total_tracks,
+      ratio: songs.size / album.total_tracks,
+    }))
+    .sort((a, b) => b.ratio - a.ratio)
+    .filter((song) => song.uniqueSongs > 2);
+
+  // Print results
+  sortedAlbums.forEach(({ album, uniqueSongs, totalTracks, ratio }) => {
+    console.log(
+      `${album.name} → ${uniqueSongs}/${totalTracks} (${(ratio * 100).toFixed(
+        1
+      )}%)`
+    );
+  });
+
+  return sortedAlbums;
+};
