@@ -62,52 +62,76 @@ async function generateCodeChallenge(codeVerifier: string) {
 
 /// CUSTOM FUNCTIONS
 
-export const inferTopAlbums = async ({
-  recentlyPlayed,
-  topArtists,
-  topSongs,
-}) => {
-  // Albums from recently played songs
-  let albums = new Map();
-  let songs = new Map();
-  let albumSongMap = new Map();
+function getAlbumsFromList(
+  items: any[],
+  getAlbum: (item: any) => any,
+  getSongId: (item: any) => string
+) {
+  const albumSongMap = new Map<string, { album: any; songs: Set<string> }>();
 
-  recentlyPlayed.forEach((item) => {
-    const album = item.track.album;
-    const albumId = album.id;
-    const songId = item.track.id;
+  items.forEach((item) => {
+    const album = getAlbum(item);
+    if (album.album_type !== "album") return;
 
-    if (album.album_type === "album") {
-      if (!albumSongMap.has(albumId)) {
-        albumSongMap.set(albumId, {
-          album: album, // keep full album object
-          songs: new Set(), // keep unique song IDs
-        });
-      }
-
-      albumSongMap.get(albumId).songs.add(songId);
+    if (!albumSongMap.has(album.id)) {
+      albumSongMap.set(album.id, { album, songs: new Set() });
     }
+    albumSongMap.get(album.id)!.songs.add(getSongId(item));
   });
 
-  // Convert Map to array
-  let sortedAlbums = Array.from(albumSongMap.values())
-    .map(({ album, songs }) => ({
-      album,
-      uniqueSongs: songs.size,
-      totalTracks: album.total_tracks,
-      ratio: songs.size / album.total_tracks,
-    }))
+  return Array.from(albumSongMap.values()).map(({ album, songs }) => ({
+    album,
+    uniqueSongs: songs.size,
+    totalTracks: album.total_tracks,
+    ratio: songs.size / album.total_tracks,
+  }));
+}
+
+const getRecentlyPlayedAlbums = (recentlyPlayed: any[]) =>
+  getAlbumsFromList(
+    recentlyPlayed,
+    (i) => i.track.album,
+    (i) => i.track.id
+  )
     .sort((a, b) => b.ratio - a.ratio)
-    .filter((song) => song.uniqueSongs > 2);
+    .filter((a) => a.uniqueSongs > 2);
 
-  // Print results
-  sortedAlbums.forEach(({ album, uniqueSongs, totalTracks, ratio }) => {
-    console.log(
-      `${album.name} → ${uniqueSongs}/${totalTracks} (${(ratio * 100).toFixed(
-        1
-      )}%)`
+const getAlbumsFromTopActivity = (topSongs: any[], topArtists: any[]) => {
+  const artistIDs = new Set(topArtists.map((a) => a.id));
+
+  return getAlbumsFromList(
+    topSongs,
+    (i) => i.album,
+    (i) => i.id
+  )
+    .sort((a, b) => b.ratio - a.ratio)
+    .filter(
+      (a) =>
+        a.uniqueSongs >= 2 ||
+        a.album.artists.some((artist: any) => artistIDs.has(artist.id))
     );
-  });
+};
 
-  return sortedAlbums;
+export const inferTopAlbums = ({ recentlyPlayed, topArtists, topSongs }) => {
+  let sortedAlbums = [];
+
+  // Albums from recently played songs
+  const recentlyPlayedAlbums = getRecentlyPlayedAlbums(recentlyPlayed);
+  const removeFromSecondList = new Set(
+    recentlyPlayedAlbums.map((a) => a.album.id)
+  );
+
+  // Albums from top songs
+  const albumsFromTopSongs = getAlbumsFromTopActivity(
+    topSongs,
+    topArtists
+  ).filter((a) => !removeFromSecondList.has(a.album.id));
+
+  // Remove artists with albums in those two fields
+
+  return {
+    recentlyPlayedAlbums,
+    albumsFromTopSongs,
+    // probableArtists,
+  };
 };
