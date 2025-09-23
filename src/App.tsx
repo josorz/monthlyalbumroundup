@@ -9,9 +9,9 @@ import axios from "axios";
 function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState("");
-  const [topSongs, setTopSongs] = useState("");
   const [topArtists, setTopArtists] = useState("");
   const [recentAlbums, setRecentAlbums] = useState("");
+  const [topAlbums, setTopAlbums] = useState("");
 
   useEffect(() => {
     const clientId = "3282c62f0e874c96bf95b45ec885b56b";
@@ -53,13 +53,15 @@ function App() {
         const topSongs = topSongsRes.data.items;
 
         setRecentlyPlayed(recentlyPlayed);
-        console.log(recentlyPlayed, topArtists, topSongs);
-        const albums = await inferTopAlbums({
-          recentlyPlayed,
-          topArtists,
-          topSongs,
-        });
-        setRecentAlbums(albums);
+        const { recentlyPlayedAlbums, albumsFromTopSongs, probableArtists } =
+          inferTopAlbums({
+            recentlyPlayed,
+            topArtists,
+            topSongs,
+          });
+        setRecentAlbums(recentlyPlayedAlbums);
+        setTopAlbums(albumsFromTopSongs);
+        setTopArtists(probableArtists);
         return { recentlyPlayed, topArtists, topSongs };
       } catch (err) {
         console.error("Error fetching song data:", err);
@@ -171,20 +173,24 @@ function App() {
           ""
         )}
       </>
-      <h1>Top Songs</h1>
       <>
-        {topSongs ? (
+        <h1>
+          Albums with at least 2 songs most listened in the past month, or 1
+          song but artist is in top 10 past month (probably)
+        </h1>
+      </>
+      <>
+        {topAlbums ? (
           <div className="flex flex-row flex-wrap">
-            {topSongs.map((track) => (
+            {topAlbums.map(({ album }) => (
               <div className="w-24 h-full m-3">
                 <br />
                 <br />
-                <img src={track.album.images[1].url} />
-                <div>{track.name}</div>
-                <div>{track.album.artists[0].name}</div>
+                <img src={album.images[1].url} />
                 <div>
-                  {track.album.name} - {track.album.album_type}
+                  <b>{album.name}</b>
                 </div>
+                <div>{album.artists[0].name}</div>
               </div>
             ))}
           </div>
@@ -192,9 +198,12 @@ function App() {
           ""
         )}
       </>
-      <h1>Top Artists</h1>
+      <h1>
+        Artist in top 15 but no song in top or recent (you probably listened to
+        their album)
+      </h1>
       <>
-        {topSongs ? (
+        {topArtists ? (
           <div className="flex flex-row flex-wrap">
             {topArtists.map((artist) => (
               <div className="w-24 h-full m-3">
