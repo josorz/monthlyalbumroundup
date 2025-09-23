@@ -128,10 +128,19 @@ export const inferTopAlbums = ({ recentlyPlayed, topArtists, topSongs }) => {
   ).filter((a) => !removeFromSecondList.has(a.album.id));
 
   // Remove artists with albums in those two fields
+  const excludeArtistIds = new Set(
+    [...recentlyPlayedAlbums, ...albumsFromTopSongs].flatMap(
+      (item) => item.album.artists[0].id
+    )
+  );
+
+  const probableArtists = topArtists.filter(
+    (artist) => !excludeArtistIds.has(artist.id)
+  );
 
   return {
     recentlyPlayedAlbums,
     albumsFromTopSongs,
-    // probableArtists,
+    probableArtists,
   };
 };
