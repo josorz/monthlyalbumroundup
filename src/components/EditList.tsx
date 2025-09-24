@@ -1,4 +1,5 @@
 import { AlbumCard } from "./AlbumCard";
+import { ChevronUp, ChevronDown, Trophy, ThumbsUp, Trash2 } from "lucide-react";
 
 export const EditList = ({ albums, setAlbums, topArtists }) => {
   const moveUp = (index) => {
@@ -42,18 +43,31 @@ export const EditList = ({ albums, setAlbums, topArtists }) => {
             <div className="w-full flex justify-between p-2">
               <div className="flex flex-row">
                 <div className="flex flex-col">
-                  <button onClick={() => moveUp(index)}>UP</button>
-                  <button onClick={() => moveDown(index)}>DOWN</button>
+                  <button onClick={() => moveUp(index)}>
+                    <ChevronUp className="hover:text-red-500" />
+                  </button>
+                  <button onClick={() => moveDown(index)}>
+                    <ChevronDown className="hover:text-red-500" />
+                  </button>
                 </div>
                 <div className="ml-4">
                   <p className="">{album.name}</p>
                   <p className="">{album.artists[0].name}</p>
                 </div>
               </div>
-              <div className="">
-                <button onClick={() => moveToTop(index)}>Top</button>
-                <button>Like</button>
-                <button onClick={() => deleteAlbum(index)}>Delete</button>
+              <div className="min-w-fit">
+                <button onClick={() => moveToTop(index)}>
+                  <Trophy strokeWidth={1} />
+                </button>
+                <button>
+                  <ThumbsUp strokeWidth={1} />
+                </button>
+                <button
+                  className="hover:text-blue"
+                  onClick={() => deleteAlbum(index)}
+                >
+                  <Trash2 strokeWidth={1} className="hover:text-red-500" />
+                </button>
               </div>
             </div>
           ))}
