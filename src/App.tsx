@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getAccessToken,
   redirectToAuthCodeFlow,
@@ -8,6 +8,7 @@ import axios from "axios";
 import { AlbumCard } from "./components/AlbumCard";
 import { EditList } from "./components/EditList";
 import { Canvas } from "./components/Canvas";
+import html2canvas from "html2canvas-pro";
 
 function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -15,6 +16,7 @@ function App() {
   const [topArtists, setTopArtists] = useState("");
   const [recentAlbums, setRecentAlbums] = useState("");
   const [topAlbums, setTopAlbums] = useState("");
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const clientId = "3282c62f0e874c96bf95b45ec885b56b";
@@ -103,6 +105,41 @@ function App() {
     return data;
   }
 
+  const handleCapture = async () => {
+    if (!canvasRef.current) return;
+
+    // Ensure all images inside the container are loaded
+    const images = canvasRef.current.querySelectorAll("img");
+    await Promise.all(
+      Array.from(images).map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else img.onload = () => resolve();
+            img.onerror = () => resolve(); // ignore broken images
+          })
+      )
+    );
+
+    try {
+      const canvas = await html2canvas(canvasRef.current, {
+        useCORS: true, // important for cross-origin images
+        allowTaint: false,
+        logging: true,
+        scrollX: 0,
+        scrollY: -window.scrollY, // ensures correct viewport capture
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "albums.png";
+      link.click();
+    } catch (err) {
+      console.error("Capture failed:", err);
+    }
+  };
+
   return (
     <div className="">
       <h1 className="text-xl font-bold mb-4">
@@ -155,12 +192,22 @@ function App() {
 
       <div className="w-full h-full flex justify-center">
         <div className="flex flex-col md:flex-row max-w-4xl">
-          <div className="flex-1 flex justify-center">
-            <Canvas
-              recentAlbums={recentAlbums}
-              topAlbums={topAlbums}
-              topArtists={topArtists}
-            />
+          <div className="flex-1 flex flex-col ">
+            <div className="">
+              <Canvas
+                recentAlbums={recentAlbums}
+                topAlbums={topAlbums}
+                topArtists={topArtists}
+                ref={canvasRef}
+              />
+            </div>
+
+            <button
+              onClick={handleCapture}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Save Image
+            </button>
           </div>
           <div className="flex-1 flex justify-center">
             <EditList

@@ -1,6 +1,10 @@
-import { Children } from "react";
-
-export const CanvasLayout = ({ children }: { children: React.ReactNode }) => {
+export const CanvasLayout = ({
+  children,
+  ref,
+}: {
+  children: React.ReactNode;
+  ref: any;
+}) => {
   return (
     <div
       className="relative inline-block overflow-hidden rounded-xl outline-1 outline-black m-2"
@@ -9,11 +13,9 @@ export const CanvasLayout = ({ children }: { children: React.ReactNode }) => {
       <div
         className="w-[1080px] h-[1920px] bg-white transform origin-top-left"
         style={{ transform: `scale(${0.3})` }}
+        ref={ref}
       >
-        {/* This is the element we will capture with html2canvas. */}
-        <div id="canvas-to-capture" className="w-full h-full bg-white p-10 ">
-          {children}
-        </div>
+        <div className="w-full h-full bg-white p-10 ">{children}</div>
       </div>
     </div>
   );
