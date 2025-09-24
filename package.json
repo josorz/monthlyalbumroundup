@@ -13,6 +13,9 @@
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
     "cors": "^2.8.5",
+    "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^1.5.11",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.13"
