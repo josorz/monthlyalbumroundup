@@ -13,6 +13,7 @@ import html2canvas from "html2canvas-pro";
 function App() {
   const [topArtists, setTopArtists] = useState("");
   const [recentAlbums, setRecentAlbums] = useState(null);
+  const [token, setToken] = useState("");
   const code = new URLSearchParams(window.location.search).get("code");
   const canvasRef = useRef<HTMLDivElement>(null);
   const clientId = "3282c62f0e874c96bf95b45ec885b56b";
@@ -24,7 +25,8 @@ function App() {
       } else {
         try {
           const accessToken = await getAccessToken(clientId, code);
-          requestSongData(accessToken);
+          setToken(accessToken);
+          requestSongData();
         } catch (err) {
           console.error("Error fetching profile:", err);
         }
@@ -32,9 +34,14 @@ function App() {
     };
 
     load();
-  }, []);
+  }, [code]);
 
-  const requestSongData = async (token: string) => {
+  useEffect(() => {
+    if (!token) return;
+    requestSongData(); // now it will always run with the updated token
+  }, [token]);
+
+  const requestSongData = async () => {
     try {
       const [recentlyPlayedRes, topArtistsRes, topSongsRes] = await Promise.all(
         [
@@ -169,7 +176,7 @@ function App() {
 
   return (
     <div className="">
-      {code ? (
+      {token ? (
         <div className="w-full h-full flex justify-center">
           <div className="flex flex-col md:flex-row max-w-4xl">
             <div className="flex-1 flex flex-col ">
@@ -193,6 +200,7 @@ function App() {
                 albums={recentAlbums}
                 setAlbums={setRecentAlbums}
                 topArtists={topArtists}
+                search={searchAlbum}
               />
             </div>
           </div>
