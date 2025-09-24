@@ -2,7 +2,7 @@ import { AlbumCard } from "./AlbumCard";
 import { ChevronUp, ChevronDown, Trophy, ThumbsUp, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export const EditList = ({ albums, setAlbums, topArtists }) => {
+export const EditList = ({ albums, setAlbums, topArtists, search }) => {
   const [selected, setSelected] = useState(null);
 
   const moveUp = (index) => {
@@ -91,6 +91,31 @@ export const EditList = ({ albums, setAlbums, topArtists }) => {
             </form>
           ))
         : null}
+
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+
+          const form = e.currentTarget;
+          const input = form.querySelector("input");
+          const searchParam = input?.value;
+          if (!searchParam) return;
+
+          // actually wait for the result
+          const album = await search(searchParam);
+          if (!album) return;
+
+          setAlbums((prev) => {
+            if (prev.some((a) => a.album.id === album.id)) return prev; // already exists
+            return [...prev, { album }];
+          });
+
+          form.reset(); // optional: clear input after add
+        }}
+      >
+        <input type="text" placeholder="Search album..." />
+        <button type="submit">Add</button>
+      </form>
 
       {albums ? (
         <div className="flex flex-row flex-wrap">
