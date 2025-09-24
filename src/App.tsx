@@ -5,6 +5,9 @@ import {
   inferTopAlbums,
 } from "./utils";
 import axios from "axios";
+import { AlbumCard } from "./components/AlbumCard";
+import { EditList } from "./components/EditList";
+import { Canvas } from "./components/Canvas";
 
 function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -59,8 +62,7 @@ function App() {
             topArtists,
             topSongs,
           });
-        setRecentAlbums(recentlyPlayedAlbums);
-        setTopAlbums(albumsFromTopSongs);
+        setRecentAlbums([...recentlyPlayedAlbums, ...albumsFromTopSongs]);
         setTopArtists(probableArtists);
         return { recentlyPlayed, topArtists, topSongs };
       } catch (err) {
@@ -102,7 +104,7 @@ function App() {
   }
 
   return (
-    <div className="p-4">
+    <div className="">
       <h1 className="text-xl font-bold mb-4">
         Display your Spotify profile data
       </h1>
@@ -150,74 +152,25 @@ function App() {
       ) : (
         <p>Loading profile...</p>
       )}
-      {/* <>{JSON.stringify(recentlyPlayed)}</> */}
-      <>
-        <h1>Recently Played Albums (sure)</h1>
-      </>
-      <>
-        {recentAlbums ? (
-          <div className="flex flex-row flex-wrap">
-            {recentAlbums.map(({ album }) => (
-              <div className="w-24 h-full m-3">
-                <br />
-                <br />
-                <img src={album.images[1].url} />
-                <div>
-                  <b>{album.name}</b>
-                </div>
-                <div>{album.artists[0].name}</div>
-              </div>
-            ))}
+
+      <div className="w-full h-full flex justify-center">
+        <div className="flex flex-col md:flex-row max-w-4xl">
+          <div className="flex-1 flex justify-center">
+            <Canvas
+              recentAlbums={recentAlbums}
+              topAlbums={topAlbums}
+              topArtists={topArtists}
+            />
           </div>
-        ) : (
-          ""
-        )}
-      </>
-      <>
-        <h1>
-          Albums with at least 2 songs most listened in the past month, or 1
-          song but artist is in top 10 past month (probably)
-        </h1>
-      </>
-      <>
-        {topAlbums ? (
-          <div className="flex flex-row flex-wrap">
-            {topAlbums.map(({ album }) => (
-              <div className="w-24 h-full m-3">
-                <br />
-                <br />
-                <img src={album.images[1].url} />
-                <div>
-                  <b>{album.name}</b>
-                </div>
-                <div>{album.artists[0].name}</div>
-              </div>
-            ))}
+          <div className="flex-1 flex justify-center">
+            <EditList
+              albums={recentAlbums}
+              setAlbums={setRecentAlbums}
+              topArtists={topArtists}
+            />
           </div>
-        ) : (
-          ""
-        )}
-      </>
-      <h1>
-        Artist in top 15 but no song in top or recent (you probably listened to
-        their album)
-      </h1>
-      <>
-        {topArtists ? (
-          <div className="flex flex-row flex-wrap">
-            {topArtists.map((artist) => (
-              <div className="w-24 h-full m-3">
-                <br />
-                <br />
-                <img src={artist.images[1].url} />
-                <div>{artist.name}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          ""
-        )}
-      </>
+        </div>
+      </div>
     </div>
   );
 }
