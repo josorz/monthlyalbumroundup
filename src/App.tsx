@@ -11,11 +11,9 @@ import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
 
 function App() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [recentlyPlayed, setRecentlyPlayed] = useState("");
   const [topArtists, setTopArtists] = useState("");
   const [recentAlbums, setRecentAlbums] = useState("");
-  const [topAlbums, setTopAlbums] = useState("");
+  const code = new URLSearchParams(window.location.search).get("code");
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,8 +27,6 @@ function App() {
       } else {
         try {
           const accessToken = await getAccessToken(clientId, code);
-          const profileData = await fetchProfile(accessToken);
-          setProfile(profileData);
           requestSongData(accessToken);
         } catch (err) {
           console.error("Error fetching profile:", err);
@@ -88,7 +84,6 @@ function App() {
       const topArtists = topArtistsRes.data.items;
       const topSongs = topSongsRes.data.items;
 
-      setRecentlyPlayed(recentlyPlayed);
       const { recentlyPlayedAlbums, albumsFromTopSongs, probableArtists } =
         inferTopAlbums({
           recentlyPlayed,
@@ -106,8 +101,16 @@ function App() {
   const handleCapture = async () => {
     if (!canvasRef.current) return;
 
-    // Ensure all images inside the container are loaded
-    const images = canvasRef.current.querySelectorAll("img");
+    const node = canvasRef.current;
+
+    // Save original transform
+    const originalTransform = node.style.transform;
+
+    // Remove scale temporarily
+    node.style.transform = "none";
+
+    // Wait for all images inside to load
+    const images = node.querySelectorAll("img");
     await Promise.all(
       Array.from(images).map(
         (img) =>
@@ -120,12 +123,13 @@ function App() {
     );
 
     try {
-      const canvas = await html2canvas(canvasRef.current, {
-        useCORS: true, // important for cross-origin images
+      const canvas = await html2canvas(node, {
+        useCORS: true,
         allowTaint: false,
         logging: true,
         scrollX: 0,
-        scrollY: -window.scrollY, // ensures correct viewport capture
+        scrollY: -window.scrollY,
+        scale: 1.33, // optional: high-resolution capture
       });
 
       const dataUrl = canvas.toDataURL("image/png");
@@ -135,6 +139,9 @@ function App() {
       link.click();
     } catch (err) {
       console.error("Capture failed:", err);
+    } finally {
+      // Restore original scale
+      node.style.transform = originalTransform;
     }
   };
 
@@ -144,57 +151,12 @@ function App() {
         Display your Spotify profile data
       </h1>
 
-      {profile ? (
-        <section id="profile" className="space-y-2">
-          <h2 className="text-lg font-semibold">
-            Logged in as <span>{profile.display_name}</span>
-          </h2>
-          {profile.images?.length > 0 && (
-            <img
-              src={profile.images[0].url}
-              alt="Avatar"
-              className="w-24 h-24 rounded-full"
-            />
-          )}
-          <ul className="list-disc list-inside">
-            <li>User ID: {profile.id}</li>
-            <li>Email: {profile.email}</li>
-            <li>
-              Spotify URI:{" "}
-              <a
-                href={profile.external_urls.spotify}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline"
-              >
-                {profile.uri}
-              </a>
-            </li>
-            <li>
-              Link:{" "}
-              <a
-                href={profile.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline"
-              >
-                {profile.href}
-              </a>
-            </li>
-            <li>Profile Image URL: {profile.images?.[0]?.url}</li>
-          </ul>
-        </section>
-      ) : (
-        <p>Loading profile...</p>
-      )}
-
       <div className="w-full h-full flex justify-center">
         <div className="flex flex-col md:flex-row max-w-4xl">
           <div className="flex-1 flex flex-col ">
             <div className="">
               <Canvas
                 recentAlbums={recentAlbums}
-                topAlbums={topAlbums}
                 topArtists={topArtists}
                 ref={canvasRef}
               />

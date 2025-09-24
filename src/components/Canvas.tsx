@@ -1,7 +1,7 @@
 import { CanvasLayout } from "./CanvasLayout";
 import { AlbumCard } from "./AlbumCard";
 
-export const Canvas = ({ recentAlbums, topAlbums, topArtists, ref }) => {
+export const Canvas = ({ recentAlbums, topArtists, ref }) => {
   const albumsArray = Array.isArray(recentAlbums) ? recentAlbums : [];
 
   const topRow = albumsArray.slice(0, 3);
