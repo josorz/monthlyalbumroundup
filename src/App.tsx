@@ -12,7 +12,7 @@ import html2canvas from "html2canvas-pro";
 
 function App() {
   const [topArtists, setTopArtists] = useState("");
-  const [recentAlbums, setRecentAlbums] = useState("");
+  const [recentAlbums, setRecentAlbums] = useState(null);
   const code = new URLSearchParams(window.location.search).get("code");
   const canvasRef = useRef<HTMLDivElement>(null);
   const clientId = "3282c62f0e874c96bf95b45ec885b56b";
@@ -75,8 +75,45 @@ function App() {
           topArtists,
           topSongs,
         });
-      setRecentAlbums([...recentlyPlayedAlbums, ...albumsFromTopSongs]);
-      setTopArtists(probableArtists);
+
+      const probableArtistsAlbumsMap = await Promise.all(
+        probableArtists?.map(async (artist) => {
+          const response = await axios.get(
+            `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          return {
+            artistId: artist.id,
+            name: artist.name,
+            albums: response.data.items,
+          };
+        }) || []
+      );
+      // Merge recent albums (already known)
+      const allRecentAlbums = [...recentlyPlayedAlbums, ...albumsFromTopSongs];
+      setRecentAlbums(allRecentAlbums);
+
+      // Create a Set of recent album IDs for fast lookup
+      const recentAlbumIds = new Set(allRecentAlbums.map((a) => a.id));
+
+      // Filter out albums that are already in recent albums
+      const filteredArtistsAlbums = probableArtistsAlbumsMap.map(
+        ({ artistId, name, albums }) => ({
+          artistId,
+          name,
+          albums: albums.filter((album) => !recentAlbumIds.has(album.id)),
+        })
+      );
+
+      // Optional: flatten if you want just a single albums array instead of grouped by artist
+      // const flattenedFilteredAlbums = filteredArtistsAlbums.flatMap(a => a.albums);
+
+      // Store grouped structure (artistId → filtered albums)
+      setTopArtists(filteredArtistsAlbums);
       return { recentlyPlayed, topArtists, topSongs };
     } catch (err) {
       console.error("Error fetching song data:", err);

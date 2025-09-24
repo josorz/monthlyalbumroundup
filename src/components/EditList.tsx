@@ -1,7 +1,10 @@
 import { AlbumCard } from "./AlbumCard";
 import { ChevronUp, ChevronDown, Trophy, ThumbsUp, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const EditList = ({ albums, setAlbums, topArtists }) => {
+  const [selected, setSelected] = useState(null);
+
   const moveUp = (index) => {
     if (index === 0) return; // Already at the top
     const newAlbums = [...albums];
@@ -37,6 +40,58 @@ export const EditList = ({ albums, setAlbums, topArtists }) => {
 
   return (
     <div className="m-4 h-xl bg-green-400 overflow-y-auto md:w-xl">
+      {topArtists
+        ? topArtists.map((artist) => (
+            <form
+              key={artist.artistId}
+              className="w-full flex justify-between items-center p-2 border-b"
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                const form = e.currentTarget; // the form element
+                const select = form.querySelector("select"); // find the <select> inside
+                const selectedId = select?.value; // get selected album id
+                if (!selectedId) return;
+
+                // find album object (if you want full album, not just id)
+                const album = artist.albums.find((a) => a.id === selectedId);
+                console.log("albumss");
+                console.log(album);
+                if (!album) return;
+
+                // check if album already in list
+                console.log(albums);
+                setAlbums((prev) => {
+                  if (prev.some((a) => a.album.id === album.id)) return prev; // already exists
+                  return [...prev, { album: album }];
+                });
+              }}
+            >
+              <div>
+                <p className="font-semibold">{artist.name}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <select>
+                  <option value="">-- Select an album --</option>
+                  {artist.albums.map((album) => (
+                    <option key={album.id} value={album.id}>
+                      {album.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-blue-500 text-white rounded"
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          ))
+        : null}
+
       {albums ? (
         <div className="flex flex-row flex-wrap">
           {albums.map(({ album }, index) => (
@@ -68,25 +123,6 @@ export const EditList = ({ albums, setAlbums, topArtists }) => {
                 >
                   <Trash2 strokeWidth={1} className="hover:text-red-500" />
                 </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
-      {topArtists ? (
-        <div className="flex flex-row flex-wrap">
-          <div className="">
-            You probably listened to an album by this artist:
-          </div>
-          {topArtists.map((artist) => (
-            <div className="w-full flex justify-between p-2">
-              <div className="">
-                <p className="">{artist.name}</p>
-              </div>
-              <div className="">
-                <button>Top</button>
-                <button>Like</button>
-                <button>Delete</button>
               </div>
             </div>
           ))}
