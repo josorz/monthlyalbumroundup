@@ -15,15 +15,12 @@ function App() {
   const [recentAlbums, setRecentAlbums] = useState("");
   const code = new URLSearchParams(window.location.search).get("code");
   const canvasRef = useRef<HTMLDivElement>(null);
+  const clientId = "3282c62f0e874c96bf95b45ec885b56b";
 
   useEffect(() => {
-    const clientId = "3282c62f0e874c96bf95b45ec885b56b";
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-
-    async function fetchData() {
+    const load = async () => {
       if (!code) {
-        redirectToAuthCodeFlow(clientId);
+        return;
       } else {
         try {
           const accessToken = await getAccessToken(clientId, code);
@@ -32,22 +29,10 @@ function App() {
           console.error("Error fetching profile:", err);
         }
       }
-    }
+    };
 
-    fetchData();
+    load();
   }, []);
-
-  async function fetchProfile(token: string): Promise<UserProfile> {
-    const { data } = await axios.get<UserProfile>(
-      "https://api.spotify.com/v1/me",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return data;
-  }
 
   const requestSongData = async (token: string) => {
     try {
@@ -147,37 +132,47 @@ function App() {
 
   return (
     <div className="">
-      <h1 className="text-xl font-bold mb-4">
-        Display your Spotify profile data
-      </h1>
+      {code ? (
+        <div className="w-full h-full flex justify-center">
+          <div className="flex flex-col md:flex-row max-w-4xl">
+            <div className="flex-1 flex flex-col ">
+              <div className="">
+                <Canvas
+                  recentAlbums={recentAlbums}
+                  topArtists={topArtists}
+                  ref={canvasRef}
+                />
+              </div>
 
-      <div className="w-full h-full flex justify-center">
-        <div className="flex flex-col md:flex-row max-w-4xl">
-          <div className="flex-1 flex flex-col ">
-            <div className="">
-              <Canvas
-                recentAlbums={recentAlbums}
+              <button
+                onClick={handleCapture}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Save Image
+              </button>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <EditList
+                albums={recentAlbums}
+                setAlbums={setRecentAlbums}
                 topArtists={topArtists}
-                ref={canvasRef}
               />
             </div>
-
-            <button
-              onClick={handleCapture}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-            >
-              Save Image
-            </button>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <EditList
-              albums={recentAlbums}
-              setAlbums={setRecentAlbums}
-              topArtists={topArtists}
-            />
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-screen gap-5">
+          <h1 className="text-3xl">Monthly Album Roundup</h1>
+          <button
+            onClick={() => {
+              redirectToAuthCodeFlow(clientId);
+            }}
+            className="w-md m-2 p-2 bg-green-700 text-white rounded-2xl"
+          >
+            Get Spotify Info
+          </button>
+        </div>
+      )}
     </div>
   );
 }
