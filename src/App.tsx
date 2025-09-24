@@ -23,57 +23,22 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
-    // async function fetchData() {
-    //   const now = new Date();
-    //   const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    //   const unixTimeFirstDayofMonth = firstDay.getTime();
-    //   console.log(unixTimeFirstDayofMonth);
-    //   if (!code) {
-    //     redirectToAuthCodeFlow(clientId);
-    //   } else {
-    //     try {
-    //       const accessToken = await getAccessToken(clientId, code);
-    //       const profileData = await fetchProfile(accessToken);
-    //       setProfile(profileData);
-    //       console.log("one done");
-    //     } catch (err) {
-    //       console.error("Error fetching profile:", err);
-    //     }
-    //   }
-    // }
-  }, []);
-
-  useEffect(() => {
-    const requestSongData = async () => {
-      try {
-        const [recentlyPlayedRes, topArtistsRes, topSongsRes] =
-          await Promise.all([
-            axios.get("/src/test1.json"),
-            axios.get("/src/test3.json"),
-            axios.get("/src/test2.json"),
-          ]);
-
-        const recentlyPlayed = recentlyPlayedRes.data.items;
-        const topArtists = topArtistsRes.data.items;
-        const topSongs = topSongsRes.data.items;
-
-        setRecentlyPlayed(recentlyPlayed);
-        const { recentlyPlayedAlbums, albumsFromTopSongs, probableArtists } =
-          inferTopAlbums({
-            recentlyPlayed,
-            topArtists,
-            topSongs,
-          });
-        setRecentAlbums([...recentlyPlayedAlbums, ...albumsFromTopSongs]);
-        setTopArtists(probableArtists);
-        return { recentlyPlayed, topArtists, topSongs };
-      } catch (err) {
-        console.error("Error fetching song data:", err);
+    async function fetchData() {
+      if (!code) {
+        redirectToAuthCodeFlow(clientId);
+      } else {
+        try {
+          const accessToken = await getAccessToken(clientId, code);
+          const profileData = await fetchProfile(accessToken);
+          setProfile(profileData);
+          requestSongData(accessToken);
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        }
       }
-    };
+    }
 
-    requestSongData();
-    // then  all unique songs
+    fetchData();
   }, []);
 
   async function fetchProfile(token: string): Promise<UserProfile> {
@@ -88,22 +53,55 @@ function App() {
     return data;
   }
 
-  async function fetchSongs(token: string): Promise<any> {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const unixTimeFirstDayofMonth = firstDay.getTime();
-    console.log(unixTimeFirstDayofMonth);
+  const requestSongData = async (token: string) => {
+    try {
+      const [recentlyPlayedRes, topArtistsRes, topSongsRes] = await Promise.all(
+        [
+          axios.get(
+            "https://api.spotify.com/v1/me/player/recently-played?limit=50",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+          axios.get(
+            "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=15",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+          axios.get(
+            "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+        ]
+      );
 
-    const { data } = await axios.get<any>(
-      `https://api.spotify.com/v1/me/player/recently-played?limit=50&after=${unixTimeFirstDayofMonth}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return data;
-  }
+      const recentlyPlayed = recentlyPlayedRes.data.items;
+      const topArtists = topArtistsRes.data.items;
+      const topSongs = topSongsRes.data.items;
+
+      setRecentlyPlayed(recentlyPlayed);
+      const { recentlyPlayedAlbums, albumsFromTopSongs, probableArtists } =
+        inferTopAlbums({
+          recentlyPlayed,
+          topArtists,
+          topSongs,
+        });
+      setRecentAlbums([...recentlyPlayedAlbums, ...albumsFromTopSongs]);
+      setTopArtists(probableArtists);
+      return { recentlyPlayed, topArtists, topSongs };
+    } catch (err) {
+      console.error("Error fetching song data:", err);
+    }
+  };
 
   const handleCapture = async () => {
     if (!canvasRef.current) return;
