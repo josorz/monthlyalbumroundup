@@ -1,6 +1,6 @@
 # Monthly Album Roundup
 
-![Demo](https://imgur.com/a/YkaDPoc)
+![Demo](https://i.imgur.com/NnV5Ptd.png)
 
 Generate a monthly roundup image of your most listened-to albums using the Spotify API.
 
