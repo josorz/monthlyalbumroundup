@@ -195,9 +195,9 @@ function App() {
   return (
     <div className="">
       {token ? (
-        <div className="w-full h-full flex justify-center">
-          <div className="flex flex-col md:flex-row max-w-4xl">
-            <div className="flex-1 flex flex-col ">
+        <div className="flex justify-center px-2">
+          <div className="flex flex-col max-w-4xl w-full sm:flex-row md:gap-4">
+            <div className="flex-1 flex flex-col items-center">
               <div className="">
                 <Canvas
                   recentAlbums={recentAlbums}
@@ -208,7 +208,7 @@ function App() {
 
               <button
                 onClick={handleCapture}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full"
               >
                 Save Image
               </button>
@@ -224,13 +224,13 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-screen gap-5">
-          <h1 className="text-3xl">Monthly Album Roundup</h1>
+        <div className="flex flex-col items-center justify-center min-h-screen gap-5 max-w-screen p-3">
+          <h1 className="text-3xl sm:text-center">Monthly Album Roundup</h1>
           <button
             onClick={() => {
               redirectToAuthCodeFlow(clientId);
             }}
-            className="w-md m-2 p-2 bg-green-700 text-white rounded-2xl"
+            className="w-full m-2 p-2 bg-green-700 text-white rounded-2xl md:w-md"
           >
             Get Spotify Info
           </button>
