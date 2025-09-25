@@ -11,6 +11,7 @@ import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
 import { Button } from "./components/Button";
 import { Download } from "lucide-react";
+import { MissingArtistAlbums } from "./components/MissingArtistAlbums";
 
 function App() {
   const [topArtists, setTopArtists] = useState("");
@@ -197,33 +198,44 @@ function App() {
   return (
     <div className="min-h-screen bg-background bg-emerald-100 bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:60px_60px]">
       {token ? (
-        <div className="flex justify-center px-2">
-          <div className="flex flex-col max-w-4xl w-full items-center sm:flex-row md:gap-4">
-            <div className="flex-1 flex flex-col items-center">
-              <div className="pointer-events-none select-none">
-                <Canvas
-                  recentAlbums={recentAlbums}
-                  topArtists={topArtists}
-                  ref={canvasRef}
-                />
-              </div>
-
-              <button onClick={handleCapture} className="rounded-md bg-black">
-                <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-600 px-6 py-2 text-xl transition-all hover:translate-x-0 hover:translate-y-0">
-                  <div className="flex flex-row gap-2">
-                    <Download /> <span>Save Image</span>
-                  </div>
-                </span>
-              </button>
-            </div>
-            <div className="flex-1 flex justify-center ">
-              <EditList
-                albums={recentAlbums}
-                setAlbums={setRecentAlbums}
+        <div>
+          <div className="flex justify-center items-center px-5 pt-2">
+            {topArtists.length > 0 ? (
+              <MissingArtistAlbums
                 topArtists={topArtists}
                 setTopArtists={setTopArtists}
-                search={searchAlbum}
+                setAlbums={setRecentAlbums}
               />
+            ) : null}
+          </div>
+          <div className="flex justify-center px-2">
+            <div className="flex flex-col max-w-4xl w-full items-center sm:flex-row md:gap-4">
+              <div className="flex-1 flex flex-col items-center">
+                <div className="pointer-events-none select-none">
+                  <Canvas
+                    recentAlbums={recentAlbums}
+                    topArtists={topArtists}
+                    ref={canvasRef}
+                  />
+                </div>
+
+                <button onClick={handleCapture} className="rounded-md bg-black">
+                  <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-600 px-6 py-2 text-xl transition-all hover:translate-x-0 hover:translate-y-0">
+                    <div className="flex flex-row gap-2">
+                      <Download /> <span>Save Image</span>
+                    </div>
+                  </span>
+                </button>
+              </div>
+              <div className="flex-1 flex justify-center ">
+                <EditList
+                  albums={recentAlbums}
+                  setAlbums={setRecentAlbums}
+                  topArtists={topArtists}
+                  setTopArtists={setTopArtists}
+                  search={searchAlbum}
+                />
+              </div>
             </div>
           </div>
         </div>
