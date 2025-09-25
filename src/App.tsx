@@ -10,7 +10,7 @@ import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
 import { Download } from "lucide-react";
 import { MissingArtistAlbums } from "./components/MissingArtistAlbums";
-import Github from "./assets/GithubLogo.svg?react";
+import Github from "./assets/GithubLogo.svg";
 
 function App() {
   const [topArtists, setTopArtists] = useState<Artist[]>([]);
