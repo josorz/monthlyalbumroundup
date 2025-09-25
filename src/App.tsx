@@ -9,6 +9,8 @@ import { AlbumCard } from "./components/AlbumCard";
 import { EditList } from "./components/EditList";
 import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
+import { Button } from "./components/Button";
+import { Download } from "lucide-react";
 
 function App() {
   const [topArtists, setTopArtists] = useState("");
@@ -193,12 +195,12 @@ function App() {
   };
 
   return (
-    <div className="">
+    <div className="min-h-screen bg-background bg-emerald-100 bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:60px_60px]">
       {token ? (
         <div className="flex justify-center px-2">
-          <div className="flex flex-col max-w-4xl w-full sm:flex-row md:gap-4">
+          <div className="flex flex-col max-w-4xl w-full items-center sm:flex-row md:gap-4">
             <div className="flex-1 flex flex-col items-center">
-              <div className="">
+              <div className="pointer-events-none select-none">
                 <Canvas
                   recentAlbums={recentAlbums}
                   topArtists={topArtists}
@@ -206,18 +208,20 @@ function App() {
                 />
               </div>
 
-              <button
-                onClick={handleCapture}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full"
-              >
-                Save Image
+              <button onClick={handleCapture} className="rounded-md bg-black">
+                <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-600 px-6 py-2 text-xl transition-all hover:translate-x-0 hover:translate-y-0">
+                  <div className="flex flex-row gap-2">
+                    <Download /> <span>Save Image</span>
+                  </div>
+                </span>
               </button>
             </div>
-            <div className="flex-1 flex justify-center">
+            <div className="flex-1 flex justify-center ">
               <EditList
                 albums={recentAlbums}
                 setAlbums={setRecentAlbums}
                 topArtists={topArtists}
+                setTopArtists={setTopArtists}
                 search={searchAlbum}
               />
             </div>
@@ -225,14 +229,18 @@ function App() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen gap-5 max-w-screen p-3">
-          <h1 className="text-3xl sm:text-center">Monthly Album Roundup</h1>
+          <h1 className="text-6xl font-bold sm:text-center">
+            Monthly Album Roundup
+          </h1>
           <button
             onClick={() => {
               redirectToAuthCodeFlow(clientId);
             }}
-            className="w-full m-2 p-2 bg-green-700 text-white rounded-2xl md:w-md"
+            className="rounded-md bg-black"
           >
-            Get Spotify Info
+            <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-600 px-6 py-2 text-xl transition-all hover:translate-x-0 hover:translate-y-0">
+              Get Spotify Info
+            </span>
           </button>
         </div>
       )}

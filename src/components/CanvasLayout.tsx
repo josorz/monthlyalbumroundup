@@ -7,7 +7,7 @@ export const CanvasLayout = ({
 }) => {
   return (
     <div
-      className="relative inline-block overflow-hidden rounded-xl outline-1 outline-black m-2"
+      className="relative inline-block overflow-hidden rounded-xl outline-2 outline-black m-2"
       style={{ width: `${1080 * 0.3}px`, height: `${1920 * 0.3}px` }}
     >
       <div
