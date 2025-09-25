@@ -11,11 +11,11 @@ export const CanvasLayout = ({
       style={{ width: `${1080 * 0.3}px`, height: `${1920 * 0.3}px` }}
     >
       <div
-        className="w-[1080px] h-[1920px] bg-white transform origin-top-left"
+        className="w-[1080px] h-[1920px] transform origin-top-left"
         style={{ transform: `scale(${0.3})` }}
         ref={ref}
       >
-        <div className="w-full h-full bg-white p-10 ">{children}</div>
+        <div className="w-full h-full p-10">{children}</div>
       </div>
     </div>
   );

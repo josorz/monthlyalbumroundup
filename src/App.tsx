@@ -180,6 +180,7 @@ function App() {
         scrollX: 0,
         scrollY: -window.scrollY,
         scale: 1.33, // optional: high-resolution capture
+        backgroundColor: null,
       });
 
       const dataUrl = canvas.toDataURL("image/png");
