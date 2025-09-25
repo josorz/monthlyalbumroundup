@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-svgr/client" />
+
 import { useEffect, useState, useRef } from "react";
 import {
   getAccessToken,
@@ -10,7 +12,7 @@ import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
 import { Download } from "lucide-react";
 import { MissingArtistAlbums } from "./components/MissingArtistAlbums";
-import Github from "./assets/GithubLogo.svg";
+import Github from "./assets/GithubLogo.svg?react";
 
 function App() {
   const [topArtists, setTopArtists] = useState<Artist[]>([]);
