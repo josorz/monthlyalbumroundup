@@ -10,6 +10,7 @@ import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
 import { Download } from "lucide-react";
 import { MissingArtistAlbums } from "./components/MissingArtistAlbums";
+import Github from "./assets/GithubLogo.svg?react";
 
 function App() {
   const [topArtists, setTopArtists] = useState<Artist[]>([]);
@@ -275,6 +276,13 @@ function App() {
               Get Spotify Info
             </span>
           </button>
+          <a
+            className="fixed bottom-0 right-0 p-4"
+            href="https://github.com/josorz/monthlyalbumroundup"
+            target="_blank"
+          >
+            <Github className="w-8 h-8 fill-current text-black" />
+          </a>
         </div>
       )}
     </div>
