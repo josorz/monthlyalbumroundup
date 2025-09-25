@@ -5,21 +5,21 @@ import {
   inferTopAlbums,
 } from "./utils";
 import axios from "axios";
-import { AlbumCard } from "./components/AlbumCard";
 import { EditList } from "./components/EditList";
 import { Canvas } from "./components/Canvas";
 import html2canvas from "html2canvas-pro";
-import { Button } from "./components/Button";
 import { Download } from "lucide-react";
 import { MissingArtistAlbums } from "./components/MissingArtistAlbums";
 
 function App() {
-  const [topArtists, setTopArtists] = useState("");
-  const [recentAlbums, setRecentAlbums] = useState(null);
-  const [token, setToken] = useState("");
-  const code = new URLSearchParams(window.location.search).get("code");
+  const [topArtists, setTopArtists] = useState<Artist[]>([]);
+  const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
+  const [token, setToken] = useState<string>("");
+  const code: string | null = new URLSearchParams(window.location.search).get(
+    "code"
+  );
   const canvasRef = useRef<HTMLDivElement>(null);
-  const clientId = "3282c62f0e874c96bf95b45ec885b56b";
+  const clientId: string = import.meta.env.VITE_SPOTIFY_CLIENT_KEY;
 
   useEffect(() => {
     const load = async () => {
@@ -79,15 +79,14 @@ function App() {
       const topArtists = topArtistsRes.data.items;
       const topSongs = topSongsRes.data.items;
 
-      const { recentlyPlayedAlbums, albumsFromTopSongs, probableArtists } =
-        inferTopAlbums({
-          recentlyPlayed,
-          topArtists,
-          topSongs,
-        });
+      const { albums, probableArtists } = inferTopAlbums({
+        recentlyPlayed,
+        topArtists,
+        topSongs,
+      });
 
       const probableArtistsAlbumsMap = await Promise.all(
-        probableArtists?.map(async (artist) => {
+        probableArtists?.map(async (artist: Artist) => {
           const response = await axios.get(
             `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album`,
             {
@@ -97,25 +96,40 @@ function App() {
             }
           );
           return {
-            artistId: artist.id,
+            id: artist.id,
             name: artist.name,
             albums: response.data.items,
           };
         }) || []
       );
-      // Merge recent albums (already known)
-      const allRecentAlbums = [...recentlyPlayedAlbums, ...albumsFromTopSongs];
-      setRecentAlbums(allRecentAlbums);
+
+      setRecentAlbums(albums);
 
       // Create a Set of recent album IDs for fast lookup
-      const recentAlbumIds = new Set(allRecentAlbums.map((a) => a.id));
+      const recentAlbumIds = new Set(recentAlbums?.map((a: Album) => a.id));
 
       // Filter out albums that are already in recent albums
       const filteredArtistsAlbums = probableArtistsAlbumsMap.map(
-        ({ artistId, name, albums }) => ({
-          artistId,
+        ({
+          id,
           name,
-          albums: albums.filter((album) => !recentAlbumIds.has(album.id)),
+          albums,
+        }: {
+          id: string;
+          name: string;
+          albums: AlbumResponse[];
+        }) => ({
+          id,
+          name,
+          albums: albums
+            .filter((album) => !recentAlbumIds.has(album.id))
+            .map((album) => ({
+              id: album.id,
+              name: album.name,
+              images: album.images,
+              artist: album.artists[0], // pick main artist
+              like: false,
+            })),
         })
       );
 
@@ -130,7 +144,7 @@ function App() {
     }
   };
 
-  const searchAlbum = async (param: string) => {
+  const searchAlbum = async (param: string): Promise<Album | null> => {
     try {
       const { data } = await axios.get(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(
@@ -143,9 +157,20 @@ function App() {
         }
       );
 
-      return data?.albums?.items?.[0] ?? null;
+      if (!data.albums.items) return null;
+
+      const response = data.albums.items[0];
+
+      return {
+        id: response.id,
+        images: response.images,
+        name: response.name,
+        artist: response.artists[0],
+        like: false,
+      };
     } catch (err) {
       console.error("Error fetching song data:", err);
+      return null;
     }
   };
   const handleCapture = async () => {
@@ -201,10 +226,11 @@ function App() {
       {token ? (
         <div>
           <div className="flex justify-center items-center px-5 pt-2">
-            {topArtists.length > 0 ? (
+            {topArtists && topArtists.length > 0 ? (
               <MissingArtistAlbums
                 topArtists={topArtists}
                 setTopArtists={setTopArtists}
+                albums={recentAlbums}
                 setAlbums={setRecentAlbums}
               />
             ) : null}
@@ -213,11 +239,7 @@ function App() {
             <div className="flex flex-col max-w-4xl w-full items-center sm:flex-row md:gap-4">
               <div className="flex-1 flex flex-col items-center">
                 <div className="pointer-events-none select-none">
-                  <Canvas
-                    recentAlbums={recentAlbums}
-                    topArtists={topArtists}
-                    ref={canvasRef}
-                  />
+                  <Canvas recentAlbums={recentAlbums} ref={canvasRef} />
                 </div>
 
                 <button onClick={handleCapture} className="rounded-md bg-black">
@@ -232,8 +254,6 @@ function App() {
                 <EditList
                   albums={recentAlbums}
                   setAlbums={setRecentAlbums}
-                  topArtists={topArtists}
-                  setTopArtists={setTopArtists}
                   search={searchAlbum}
                 />
               </div>

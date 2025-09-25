@@ -1,6 +1,12 @@
 import { ThumbsUp } from "lucide-react";
 
-export const AlbumCard = ({ album, size = "large", like }) => {
+export const AlbumCard = ({
+  album,
+  size = "large",
+}: {
+  album: Album;
+  size: string;
+}) => {
   // size can be "large" or "small"
   const isLarge = size === "large";
 
@@ -12,7 +18,7 @@ export const AlbumCard = ({ album, size = "large", like }) => {
     >
       <div className="relative">
         <img
-          src={album.images[1].url}
+          src={album.images?.[1].url}
           alt={album.name}
           crossOrigin="anonymous"
           className={`
@@ -46,7 +52,7 @@ export const AlbumCard = ({ album, size = "large", like }) => {
               : "text-wrap text-sm text-gray-600"
           }
         >
-          {album.artists[0].name}
+          {album.artist.name}
         </p>
       </div>
     </div>

@@ -1,7 +1,14 @@
 import { CanvasLayout } from "./CanvasLayout";
 import { AlbumCard } from "./AlbumCard";
+import type { Ref } from "react";
 
-export const Canvas = ({ recentAlbums, topArtists, ref }) => {
+export const Canvas = ({
+  recentAlbums,
+  ref,
+}: {
+  recentAlbums: Album[];
+  ref: Ref<HTMLDivElement>;
+}) => {
   const albumsArray = Array.isArray(recentAlbums) ? recentAlbums : [];
 
   const topRow = albumsArray.slice(0, 3);
@@ -19,17 +26,17 @@ export const Canvas = ({ recentAlbums, topArtists, ref }) => {
           {/* Top row: bigger cards, dynamic width */}
           <div className="flex justify-center">
             <div className="grid grid-flow-row-dense grid-cols-3">
-              {topRow.map(({ album }) => (
+              {topRow.map((album: Album) => (
                 <div key={album.id} className="">
-                  <AlbumCard album={album} />
+                  <AlbumCard album={album} size="large" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Bottom rows: normal cards, 5 per row */}
+          {/* Bottom rows: normal cards , 5 per row */}
           <div className="grid grid-flow-row-dense grid-cols-5">
-            {bottomRow.map(({ album }) => (
+            {bottomRow.map((album: Album) => (
               <div key={album.id}>
                 <AlbumCard album={album} size="small" />
               </div>

@@ -1,27 +1,25 @@
-import { AlbumCard } from "./AlbumCard";
 import {
   ChevronUp,
   ChevronDown,
-  Trophy,
   ThumbsUp,
   Trash2,
   Plus,
-  Cross,
-  X,
   ArrowUpToLine,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+
+type SearchFn = (query: string) => Promise<Album | null>;
 
 export const EditList = ({
   albums,
   setAlbums,
-  topArtists,
-  setTopArtists,
   search,
+}: {
+  albums: Album[] | null;
+  setAlbums: React.Dispatch<React.SetStateAction<Album[]>>;
+  search: SearchFn;
 }) => {
-  const [selected, setSelected] = useState(null);
-
-  const moveUp = (index) => {
+  const moveUp = (index: number) => {
+    if (!albums) return;
     if (index === 0) return; // Already at the top
     const newAlbums = [...albums];
     [newAlbums[index - 1], newAlbums[index]] = [
@@ -31,7 +29,8 @@ export const EditList = ({
     setAlbums(newAlbums);
   };
 
-  const moveDown = (index) => {
+  const moveDown = (index: number) => {
+    if (!albums) return;
     if (index === albums.length - 1) return; // Already at the bottom
     const newAlbums = [...albums];
     [newAlbums[index], newAlbums[index + 1]] = [
@@ -41,7 +40,8 @@ export const EditList = ({
     setAlbums(newAlbums);
   };
 
-  const moveToTop = (index) => {
+  const moveToTop = (index: number) => {
+    if (!albums) return;
     if (index === 0) return;
     const newAlbums = [...albums];
     const [albumToMove] = newAlbums.splice(index, 1); // Remove the album
@@ -49,22 +49,20 @@ export const EditList = ({
     setAlbums(newAlbums);
   };
 
-  const toggleLike = (index) => {
+  const toggleLike = (index: number) => {
+    if (!albums) return;
     const newAlbums = [...albums];
     const album = newAlbums[index];
 
-    if (album.album.like === undefined) {
-      album.album.like = true;
-    } else {
-      album.album.like = !album.album.like;
-    }
+    album.like = !album.like;
 
     setAlbums(newAlbums);
 
     console.log(album);
   };
 
-  const deleteAlbum = (index) => {
+  const deleteAlbum = (index: number) => {
+    if (!albums) return;
     const newAlbums = albums.filter((_, i) => i !== index); // Remove album
     setAlbums(newAlbums);
   };
@@ -76,7 +74,7 @@ export const EditList = ({
           <h2 className="text-3xl text-center m-2 font-semibold">Album List</h2>
           {albums ? (
             <div className="flex flex-row flex-wrap border-black border-1">
-              {albums.map(({ album, like }, index) => (
+              {albums.map((album, index) => (
                 <div className="w-full flex justify-between p-2 items-center border-black border-1">
                   <div className="flex flex-col">
                     <button onClick={() => moveUp(index)}>
@@ -90,7 +88,7 @@ export const EditList = ({
                     <p className="leading-none text-lg font-semibold">
                       {album.name}
                     </p>
-                    <p className="text-md">{album.artists[0].name}</p>
+                    <p className="text-md">{album.artist.name}</p>
                   </div>
                   <div className="min-w-fit">
                     <button
@@ -101,11 +99,11 @@ export const EditList = ({
                     </button>
                     <button
                       className={`hover:text-green-500 ${
-                        album.like ? "text-green-500" : ""
+                        album?.like ? "text-green-500" : ""
                       }`}
                       onClick={() => toggleLike(index)}
                     >
-                      <ThumbsUp strokeWidth={album.like ? 2 : 1} />
+                      <ThumbsUp strokeWidth={album?.like ? 2 : 1} />
                     </button>
 
                     <button onClick={() => deleteAlbum(index)}>
@@ -134,8 +132,9 @@ export const EditList = ({
               if (!album) return;
 
               setAlbums((prev) => {
-                if (prev.some((a) => a.album.id === album.id)) return prev;
-                return [...prev, { album }];
+                if (!prev) return [album];
+                if (prev.some((a) => a?.id === album.id)) return prev;
+                return [...prev, album];
               });
 
               form.reset();

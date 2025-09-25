@@ -109,9 +109,15 @@ const getAlbumsFromTopActivity = (topSongs: any[], topArtists: any[]) => {
     );
 };
 
-export const inferTopAlbums = ({ recentlyPlayed, topArtists, topSongs }) => {
-  let sortedAlbums = [];
-
+export const inferTopAlbums = ({
+  recentlyPlayed,
+  topArtists,
+  topSongs,
+}: {
+  recentlyPlayed: Album[];
+  topArtists: Artist[];
+  topSongs: Track[];
+}) => {
   // Albums from recently played songs
   const recentlyPlayedAlbums = getRecentlyPlayedAlbums(recentlyPlayed);
   const removeFromSecondList = new Set(
@@ -125,19 +131,26 @@ export const inferTopAlbums = ({ recentlyPlayed, topArtists, topSongs }) => {
   ).filter((a) => !removeFromSecondList.has(a.album.id));
 
   // Remove artists with albums in those two fields
-  const excludeArtistIds = new Set(
-    [...recentlyPlayedAlbums, ...albumsFromTopSongs].flatMap(
-      (item) => item.album.artists[0].id
-    )
-  );
+  const albums: Album[] = [...recentlyPlayedAlbums, ...albumsFromTopSongs]
+    .map((item) => ({
+      id: item.album.id,
+      name: item.album.name,
+      images: item.album.images,
+      artist: item.album.artists[0],
+      like: false,
+    }))
+    .filter(
+      (album, index, self) => index === self.findIndex((a) => a.id === album.id)
+    );
+
+  const excludeArtistIds = new Set(albums.map((album) => album.artist.id));
 
   const probableArtists = topArtists.filter(
     (artist) => !excludeArtistIds.has(artist.id)
   );
 
   return {
-    recentlyPlayedAlbums,
-    albumsFromTopSongs,
+    albums,
     probableArtists,
   };
 };

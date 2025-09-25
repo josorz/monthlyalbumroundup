@@ -1,9 +1,11 @@
+import type { Ref } from "react";
+
 export const CanvasLayout = ({
   children,
   ref,
 }: {
   children: React.ReactNode;
-  ref: any;
+  ref: Ref<HTMLDivElement>;
 }) => {
   return (
     <div

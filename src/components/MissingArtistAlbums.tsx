@@ -3,9 +3,16 @@ import { Plus, X } from "lucide-react";
 export const MissingArtistAlbums = ({
   topArtists,
   setTopArtists,
+  albums,
   setAlbums,
+}: {
+  topArtists: Artist[] | null;
+  setTopArtists: React.Dispatch<React.SetStateAction<Artist[]>>;
+  albums: Album[];
+  setAlbums: React.Dispatch<React.SetStateAction<Album[]>>;
 }) => {
-  const deleteArtist = (index) => {
+  const deleteArtist = (index: number) => {
+    if (!topArtists) return;
     const newArtists = topArtists.filter((_, i) => i !== index); // Remove album
     setTopArtists(newArtists);
   };
@@ -16,61 +23,63 @@ export const MissingArtistAlbums = ({
         <h2 className="text-xl text-center pt-1 font-semibold">
           Add albums from your top artists
         </h2>
-        {topArtists.map((artist, index) => (
-          <form
-            key={artist.artistId}
-            className="flex w-full flex-1 justify-between items-center p-2 border-1 border-black"
-            onSubmit={(e) => {
-              e.preventDefault();
+        {topArtists
+          ? topArtists.map((artist, index) => (
+              <form
+                key={artist.id}
+                className="flex w-full flex-1 justify-between items-center p-2 border-1 border-black"
+                onSubmit={(e) => {
+                  e.preventDefault();
 
-              const form = e.currentTarget; // the form element
-              const select = form.querySelector("select"); // find the <select> inside
-              const selectedId = select?.value; // get selected album id
-              if (!selectedId) return;
+                  const form = e.currentTarget; // the form element
+                  let select = form.querySelector<HTMLSelectElement>("select"); // find the <select> inside
+                  const selectedId = select?.value; // get selected album id
+                  if (!selectedId) return;
 
-              // find album object (if you want full album, not just id)
-              const album = artist.albums.find((a) => a.id === selectedId);
-              if (!album) return;
+                  // find album object (if you want full album, not just id)
+                  if (!artist.albums) return;
+                  const album = artist.albums.find((a) => a.id === selectedId);
+                  if (!album) return;
 
-              // check if album already in list
-              setAlbums((prev) => {
-                if (prev.some((a) => a.album.id === album.id)) return prev; // already exists
-                return [...prev, { album: album }];
-              });
+                  if (!albums.some((a) => a.id === album.id)) {
+                    setAlbums([...albums, album]);
+                  }
 
-              form.reset();
-              select = "";
-            }}
-          >
-            <div className="w-full sm:flex sm:flex-row">
-              <div className="min-w-40 text-wrap">
-                <label className="truncate sm:w-2">{artist.name}</label>
-              </div>
-              <select className="flex pl-2 truncate w-full" defaultValue="">
-                <option value="" disabled></option>
-                {artist.albums.map((album) => (
-                  <option key={album.id} value={album.id}>
-                    Add "{album.name}"
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col-reverse sm:flex-row">
-              <button type="submit" className="p-0.5 text-black ">
-                <Plus />
-              </button>
-              <button
-                onClick={(e) => {
-                  deleteArtist(index);
+                  form.reset();
                 }}
-                className="p-0.5 text-black "
               >
-                <X />
-              </button>
-            </div>
-          </form>
-        ))}
+                <div className="w-full sm:flex sm:flex-row">
+                  <div className="min-w-40 text-wrap">
+                    <label className="truncate sm:w-2">{artist.name}</label>
+                  </div>
+                  <select className="flex pl-2 truncate w-full" defaultValue="">
+                    <option value="" disabled></option>
+                    {artist.albums
+                      ? artist.albums.map((album) => (
+                          <option key={album.id} value={album.id}>
+                            Add "{album.name}"
+                          </option>
+                        ))
+                      : null}
+                  </select>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row">
+                  <button type="submit" className="p-0.5 text-black ">
+                    <Plus />
+                  </button>
+                  <button
+                    onClick={() => {
+                      deleteArtist(index);
+                    }}
+                    className="p-0.5 text-black "
+                  >
+                    <X />
+                  </button>
+                </div>
+              </form>
+            ))
+          : null}
       </div>
     </div>
   );
