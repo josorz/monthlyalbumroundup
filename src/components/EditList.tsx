@@ -49,6 +49,21 @@ export const EditList = ({
     setAlbums(newAlbums);
   };
 
+  const toggleLike = (index) => {
+    const newAlbums = [...albums];
+    const album = newAlbums[index];
+
+    if (album.album.like === undefined) {
+      album.album.like = true;
+    } else {
+      album.album.like = !album.album.like;
+    }
+
+    setAlbums(newAlbums);
+
+    console.log(album);
+  };
+
   const deleteAlbum = (index) => {
     const newAlbums = albums.filter((_, i) => i !== index); // Remove album
     setAlbums(newAlbums);
@@ -133,7 +148,7 @@ export const EditList = ({
           <hr className="border-black pb-3" />
           {albums ? (
             <div className="flex flex-row flex-wrap">
-              {albums.map(({ album }, index) => (
+              {albums.map(({ album, like }, index) => (
                 <div className="w-full flex justify-between p-2 items-center">
                   <div className="flex flex-row">
                     <div className="flex flex-col">
@@ -156,9 +171,15 @@ export const EditList = ({
                     >
                       <ArrowUpToLine strokeWidth={1} />
                     </button>
-                    <button>
-                      <ThumbsUp strokeWidth={1} />
+                    <button
+                      className={`hover:text-green-500 ${
+                        album.like ? "text-green-500" : ""
+                      }`}
+                      onClick={() => toggleLike(index)}
+                    >
+                      <ThumbsUp strokeWidth={album.like ? 2 : 1} />
                     </button>
+
                     <button onClick={() => deleteAlbum(index)}>
                       <Trash2 strokeWidth={1} className="hover:text-red-500" />
                     </button>

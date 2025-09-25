@@ -1,6 +1,6 @@
 import { ThumbsUp } from "lucide-react";
 
-export const AlbumCard = ({ album, size = "large" }) => {
+export const AlbumCard = ({ album, size = "large", like }) => {
   // size can be "large" or "small"
   const isLarge = size === "large";
 
@@ -20,10 +20,14 @@ export const AlbumCard = ({ album, size = "large" }) => {
         ${isLarge ? "" : "max-h-55"}
       `}
         />
-        <ThumbsUp
-          className="absolute -top-3 -right-3  text-blue-500"
-          size={36}
-        />
+        {album.like ? (
+          <ThumbsUp
+            className="absolute -top-3 -right-3  text-black"
+            size={36}
+            fill="#2b7fff"
+            strokeWidth={1}
+          />
+        ) : null}
       </div>
 
       <div className="mt-2 text-center max-w-full">
