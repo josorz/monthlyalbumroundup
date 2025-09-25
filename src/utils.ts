@@ -11,10 +11,7 @@ export async function redirectToAuthCodeFlow(clientId: string) {
   params.append("client_id", clientId);
   params.append("response_type", "code");
   params.append("redirect_uri", "https://127.0.0.1");
-  params.append(
-    "scope",
-    "user-read-private user-read-email user-read-recently-played user-top-read"
-  );
+  params.append("scope", "user-read-recently-played user-top-read");
   params.append("code_challenge_method", "S256");
   params.append("code_challenge", challenge);
 

@@ -33,7 +33,7 @@ export const AlbumCard = ({ album, size = "large", like }) => {
       <div className="mt-2 text-center max-w-full">
         <p
           className={`
-        font-bold truncate text-wrap
+        font-bold truncate text-wrap leading-none
         ${isLarge ? "text-3xl" : "text-lg"}
       `}
         >
