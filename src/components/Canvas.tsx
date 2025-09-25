@@ -13,13 +13,21 @@ export const Canvas = ({
 
   const topRow = albumsArray.slice(0, 3);
   const bottomRow = albumsArray.slice(3);
+
+  const now = new Date();
+
+  const monthYear = now.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <CanvasLayout ref={ref}>
       <h1 className="font-bold capitalize text-[150px] leading-none text-center mb-2">
         MONTHLY ALBUM ROUNDUP
       </h1>
       <h2 className="font-semibold capitalize text-[36px] leading-none text-center mb-7">
-        September 2025
+        {monthYear.toUpperCase()}
       </h2>
       <main>
         <div className="">
