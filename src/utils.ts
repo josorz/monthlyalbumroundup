@@ -25,7 +25,7 @@ export async function getAccessToken(clientId: string, code: string) {
   params.append("client_id", clientId);
   params.append("grant_type", "authorization_code");
   params.append("code", code);
-  params.append("redirect_uri", "https://127.0.0.1");
+  params.append("redirect_uri", "https://monthlyalbumroundup.vercel.app");
   params.append("code_verifier", verifier!);
 
   const { data } = await axios.post(
