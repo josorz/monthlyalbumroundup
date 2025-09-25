@@ -70,30 +70,27 @@ export const EditList = ({
   };
 
   return (
-    <div className="flex flex-col m-4 w-full">
-      <div className="rounded-md bg-black my-2">
+    <div className="flex flex-col m-2 w-full">
+      <div className="rounded-md bg-black my-1">
         <div className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-200 h-full sm:h-150 sm:overflow-y-auto">
-          <h2 className="text-2xl text-center m-3 font-semibold">
-            Edit Album List
-          </h2>
-          <hr className="border-black pb-3" />
+          <h2 className="text-3xl text-center m-2 font-semibold">Album List</h2>
           {albums ? (
-            <div className="flex flex-row flex-wrap">
+            <div className="flex flex-row flex-wrap border-black border-1">
               {albums.map(({ album, like }, index) => (
-                <div className="w-full flex justify-between p-2 items-center">
-                  <div className="flex flex-row">
-                    <div className="flex flex-col">
-                      <button onClick={() => moveUp(index)}>
-                        <ChevronUp className="hover:text-green-500" />
-                      </button>
-                      <button onClick={() => moveDown(index)}>
-                        <ChevronDown className="hover:text-green-500" />
-                      </button>
-                    </div>
-                    <div className="ml-2 pr-1">
-                      <p className="text-md">{album.name}</p>
-                      <p className="text-xs">{album.artists[0].name}</p>
-                    </div>
+                <div className="w-full flex justify-between p-2 items-center border-black border-1">
+                  <div className="flex flex-col">
+                    <button onClick={() => moveUp(index)}>
+                      <ChevronUp className="hover:text-green-500" />
+                    </button>
+                    <button onClick={() => moveDown(index)}>
+                      <ChevronDown className="hover:text-green-500" />
+                    </button>
+                  </div>
+                  <div className="flex-1 ml-2 pr-1">
+                    <p className="leading-none text-lg font-semibold">
+                      {album.name}
+                    </p>
+                    <p className="text-md">{album.artists[0].name}</p>
                   </div>
                   <div className="min-w-fit">
                     <button
@@ -121,7 +118,7 @@ export const EditList = ({
           ) : null}
         </div>
       </div>
-      <div className="rounded-md bg-black">
+      <div className="rounded-md bg-black mt-3">
         <div className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-200 px-2 py-2">
           <form
             className="w-full"

@@ -13,7 +13,7 @@ export const MissingArtistAlbums = ({
   return (
     <div className="rounded-md bg-black my-2 w:full sm:w-4xl">
       <div className="block -translate-x-1 -translate-y-1 rounded-md border-2 border-black bg-green-200">
-        <h2 className="text-lg text-center pt-1 font-semibold">
+        <h2 className="text-xl text-center pt-1 font-semibold">
           Add albums from your top artists
         </h2>
         {topArtists.map((artist, index) => (
@@ -44,9 +44,7 @@ export const MissingArtistAlbums = ({
           >
             <div className="w-full sm:flex sm:flex-row">
               <div className="min-w-40 text-wrap">
-                <label className="font-semibold truncate sm:w-2">
-                  {artist.name}
-                </label>
+                <label className="truncate sm:w-2">{artist.name}</label>
               </div>
               <select className="flex pl-2 truncate w-full" defaultValue="">
                 <option value="" disabled></option>
