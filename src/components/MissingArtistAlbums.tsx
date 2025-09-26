@@ -65,14 +65,17 @@ export const MissingArtistAlbums = ({
                 </div>
 
                 <div className="flex flex-col-reverse sm:flex-row">
-                  <button type="submit" className="p-0.5 text-black ">
+                  <button
+                    type="submit"
+                    className="p-0.5 text-black hover:text-green-500"
+                  >
                     <Plus />
                   </button>
                   <button
                     onClick={() => {
                       deleteArtist(index);
                     }}
-                    className="p-0.5 text-black "
+                    className="p-0.5 text-black hover:text-red-500"
                   >
                     <X />
                   </button>

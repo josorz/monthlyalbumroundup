@@ -149,7 +149,10 @@ export const EditList = ({
                 placeholder="Search album"
                 className="flex-1 border px-2 py-1 w-full"
               />
-              <button type="submit" className="px-1 text-black">
+              <button
+                type="submit"
+                className="px-1 text-black hover:text-green-500"
+              >
                 <Plus />
               </button>
             </div>
