@@ -40,7 +40,7 @@ export const AlbumCard = ({
         <p
           className={`
         font-bold truncate text-wrap leading-none text-neutral-100 
-        ${isLarge ? "text-3xl drop-shadow-lg" : "text-lg drop-shadow-md"}
+        ${isLarge ? "text-3xl text-shadow-lg" : "text-lg text-shadow-md"}
       `}
         >
           {album.name}
@@ -48,8 +48,8 @@ export const AlbumCard = ({
         <p
           className={
             isLarge
-              ? "text-wrap text-2xl text-neutral-300 drop-shadow-sm"
-              : "text-wrap text-sm text-neutral-300 drop-shadow-sm"
+              ? "text-wrap text-2xl text-neutral-300 text-shadow-sm"
+              : "text-wrap text-sm text-neutral-300 text-shadow-sm"
           }
         >
           {album.artist.name}

@@ -265,7 +265,7 @@ function App() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen gap-5 max-w-screen p-3">
-          <h1 className="text-6xl font-bold sm:text-center">
+          <h1 className="text-6xl font-bold text-center">
             Monthly Album Roundup
           </h1>
           <button

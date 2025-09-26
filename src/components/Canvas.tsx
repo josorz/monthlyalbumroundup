@@ -29,10 +29,10 @@ export const Canvas = ({
 
   return (
     <CanvasLayout ref={ref}>
-      <h1 className="font-bold capitalize text-[150px] leading-none text-center mb-2 text-neutral-100 drop-shadow-lg">
+      <h1 className="font-bold capitalize text-[150px] leading-none text-center mb-2 text-neutral-100 text-shadow-lg">
         MONTHLY ALBUM ROUNDUP
       </h1>
-      <h2 className="font-semibold capitalize text-[36px] leading-none text-center mb-7 text-neutral-100 drop-shadow-lg">
+      <h2 className="font-semibold capitalize text-[36px] leading-none text-center mb-7 text-neutral-100 text-shadow-lg">
         {monthYear.toUpperCase()}
       </h2>
       <main>
@@ -58,7 +58,7 @@ export const Canvas = ({
           </div>
         </div>
       </main>
-      <footer className="h-10 font-bold text-3xl text-center mb-[10px] text-neutral-100 drop-shadow-lg">
+      <footer className="h-10 font-bold text-3xl text-center mb-[10px] text-neutral-100 text-shadow-lg">
         monthlyalbumroundup.vercel.app
       </footer>
     </CanvasLayout>
