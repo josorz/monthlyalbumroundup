@@ -16,7 +16,13 @@ export const Canvas = ({
 
   const now = new Date();
 
-  const monthYear = now.toLocaleString("default", {
+  const displayDate = new Date(now);
+
+  if (now.getDate() <= 7) {
+    displayDate.setMonth(displayDate.getMonth() - 1);
+  }
+
+  const monthYear = displayDate.toLocaleString("default", {
     month: "long",
     year: "numeric",
   });
