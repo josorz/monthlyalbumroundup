@@ -39,8 +39,8 @@ export const AlbumCard = ({
       <div className="mt-2 text-center max-w-full">
         <p
           className={`
-        font-bold truncate text-wrap leading-none
-        ${isLarge ? "text-3xl" : "text-lg"}
+        font-bold truncate text-wrap leading-none text-neutral-100 
+        ${isLarge ? "text-3xl drop-shadow-lg" : "text-lg drop-shadow-md"}
       `}
         >
           {album.name}
@@ -48,8 +48,8 @@ export const AlbumCard = ({
         <p
           className={
             isLarge
-              ? "text-wrap text-2xl text-gray-600"
-              : "text-wrap text-sm text-gray-600"
+              ? "text-wrap text-2xl text-neutral-300 drop-shadow-sm"
+              : "text-wrap text-sm text-neutral-300 drop-shadow-sm"
           }
         >
           {album.artist.name}
